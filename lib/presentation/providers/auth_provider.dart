@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+
 import '../../core/services/auth_service.dart';
 import '../../data/models/auth.dart';
 import '../../data/models/user.dart';
@@ -25,7 +26,7 @@ class AuthProvider extends ChangeNotifier {
       if (isAuth) {
         final user = await _authService.getCurrentUser();
         final token = await _authService.getToken();
-        
+
         if (user != null && token != null) {
           _updateState(AuthState(
             user: user,
@@ -36,7 +37,7 @@ class AuthProvider extends ChangeNotifier {
           return;
         }
       }
-      
+
       _updateState(const AuthState(isLoading: false));
     } catch (e) {
       _updateState(AuthState(
@@ -60,7 +61,7 @@ class AuthProvider extends ChangeNotifier {
       }
 
       final response = await _authService.login(email, password);
-      
+
       _updateState(AuthState(
         user: response.user,
         token: response.token,
@@ -125,10 +126,4 @@ class AuthProvider extends ChangeNotifier {
   bool _isValidEmail(String email) {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }
-

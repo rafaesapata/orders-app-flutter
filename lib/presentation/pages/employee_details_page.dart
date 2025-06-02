@@ -12,7 +12,8 @@ class EmployeeDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+    final currencyFormat =
+        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
     final dateFormat = DateFormat('dd/MM/yyyy');
 
     return Scaffold(
@@ -66,7 +67,7 @@ class EmployeeDetailsPage extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     Theme.of(context).primaryColor,
-                    Theme.of(context).primaryColor.withOpacity(0.8),
+                    Theme.of(context).primaryColor.withAlpha(204),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -77,9 +78,14 @@ class EmployeeDetailsPage extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 50,
-                    backgroundColor: Colors.white.withOpacity(0.2),
+                    backgroundColor: Colors.white.withAlpha(51),
                     child: Text(
-                      employee.name.split(' ').map((n) => n[0]).take(2).join().toUpperCase(),
+                      employee.name
+                          .split(' ')
+                          .map((n) => n[0])
+                          .take(2)
+                          .join()
+                          .toUpperCase(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 32,
@@ -101,7 +107,7 @@ class EmployeeDetailsPage extends StatelessWidget {
                   Text(
                     employee.position,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withAlpha(229),
                       fontSize: 16,
                     ),
                     textAlign: TextAlign.center,
@@ -110,19 +116,20 @@ class EmployeeDetailsPage extends StatelessWidget {
                   Text(
                     employee.department,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withAlpha(204),
                       fontSize: 14,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: _getStatusColor(employee.status).withOpacity(0.2),
+                      color: _getStatusColor(employee.status).withAlpha(51),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: _getStatusColor(employee.status).withOpacity(0.5),
+                        color: _getStatusColor(employee.status).withAlpha(127),
                       ),
                     ),
                     child: Text(
@@ -147,9 +154,11 @@ class EmployeeDetailsPage extends StatelessWidget {
                 if (employee.phone != null)
                   _buildInfoRow(Icons.phone, 'Telefone', employee.phone!),
                 if (employee.document != null)
-                  _buildInfoRow(Icons.badge, 'CPF', _formatCPF(employee.document!)),
+                  _buildInfoRow(
+                      Icons.badge, 'CPF', _formatCPF(employee.document!)),
                 if (employee.address != null)
-                  _buildInfoRow(Icons.location_on, 'Endereço', employee.address!),
+                  _buildInfoRow(
+                      Icons.location_on, 'Endereço', employee.address!),
               ],
             ),
 
@@ -159,13 +168,18 @@ class EmployeeDetailsPage extends StatelessWidget {
             _buildSection(
               'Informações Profissionais',
               [
-                _buildInfoRow(Icons.business, 'Departamento', employee.department),
+                _buildInfoRow(
+                    Icons.business, 'Departamento', employee.department),
                 _buildInfoRow(Icons.work, 'Cargo', employee.position),
-                _buildInfoRow(Icons.admin_panel_settings, 'Função', employee.role.label),
-                _buildInfoRow(Icons.attach_money, 'Salário', currencyFormat.format(employee.salary)),
-                _buildInfoRow(Icons.calendar_today, 'Data de Contratação', dateFormat.format(employee.hireDate)),
+                _buildInfoRow(
+                    Icons.admin_panel_settings, 'Função', employee.role.label),
+                _buildInfoRow(Icons.attach_money, 'Salário',
+                    currencyFormat.format(employee.salary)),
+                _buildInfoRow(Icons.calendar_today, 'Data de Contratação',
+                    dateFormat.format(employee.hireDate)),
                 if (employee.terminationDate != null)
-                  _buildInfoRow(Icons.event_busy, 'Data de Desligamento', dateFormat.format(employee.terminationDate!)),
+                  _buildInfoRow(Icons.event_busy, 'Data de Desligamento',
+                      dateFormat.format(employee.terminationDate!)),
               ],
             ),
 
@@ -175,9 +189,11 @@ class EmployeeDetailsPage extends StatelessWidget {
             _buildSection(
               'Informações do Sistema',
               [
-                _buildInfoRow(Icons.person_add, 'Cadastrado em', dateFormat.format(employee.createdAt)),
+                _buildInfoRow(Icons.person_add, 'Cadastrado em',
+                    dateFormat.format(employee.createdAt)),
                 if (employee.updatedAt != null)
-                  _buildInfoRow(Icons.update, 'Última atualização', dateFormat.format(employee.updatedAt!)),
+                  _buildInfoRow(Icons.update, 'Última atualização',
+                      dateFormat.format(employee.updatedAt!)),
                 _buildInfoRow(Icons.fingerprint, 'ID do Sistema', employee.id),
               ],
             ),
@@ -193,7 +209,8 @@ class EmployeeDetailsPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => EmployeeFormPage(employee: employee),
+                          builder: (context) =>
+                              EmployeeFormPage(employee: employee),
                         ),
                       );
                     },
@@ -240,7 +257,7 @@ class EmployeeDetailsPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withAlpha(25),
             spreadRadius: 1,
             blurRadius: 6,
             offset: const Offset(0, 2),
@@ -343,13 +360,15 @@ class EmployeeDetailsPage extends StatelessWidget {
                   onPressed: employeesProvider.isLoading
                       ? null
                       : () async {
-                          final success = await employeesProvider.deleteEmployee(employee.id);
+                          final success = await employeesProvider
+                              .deleteEmployee(employee.id);
                           if (success && context.mounted) {
                             Navigator.of(context).pop(); // Fecha o dialog
                             Navigator.of(context).pop(); // Volta para a lista
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Funcionário excluído com sucesso!'),
+                                content:
+                                    Text('Funcionário excluído com sucesso!'),
                                 backgroundColor: Colors.green,
                               ),
                             );
@@ -365,7 +384,8 @@ class EmployeeDetailsPage extends StatelessWidget {
                           height: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
                       : const Text('Excluir'),
@@ -378,4 +398,3 @@ class EmployeeDetailsPage extends StatelessWidget {
     );
   }
 }
-

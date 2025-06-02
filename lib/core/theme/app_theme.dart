@@ -27,7 +27,7 @@ class AppTheme {
       cardTheme: CardTheme(
         color: surfaceColor,
         elevation: 2,
-        shadowColor: Colors.black.withOpacity(0.1),
+        shadowColor: Colors.black.withAlpha(25),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -37,7 +37,7 @@ class AppTheme {
           backgroundColor: primaryColor,
           foregroundColor: Colors.white,
           elevation: 2,
-          shadowColor: primaryColor.withOpacity(0.3),
+          shadowColor: primaryColor.withAlpha(76),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -77,7 +77,8 @@ class AppTheme {
         ),
         filled: true,
         fillColor: Colors.grey[50],
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: surfaceColor,
@@ -171,7 +172,7 @@ class AppTheme {
       cardTheme: CardTheme(
         color: const Color(0xFF1E293B),
         elevation: 2,
-        shadowColor: Colors.black.withOpacity(0.3),
+        shadowColor: Colors.black.withAlpha(76),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -186,4 +187,3 @@ class AppTheme {
     );
   }
 }
-

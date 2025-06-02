@@ -40,7 +40,7 @@ class CustomButton extends StatelessWidget {
           disabledBackgroundColor: Colors.grey[300],
           disabledForegroundColor: Colors.grey[600],
           elevation: isDisabled ? 0 : 2,
-          shadowColor: theme.primaryColor.withOpacity(0.3),
+          shadowColor: theme.primaryColor.withAlpha(76),
           shape: RoundedRectangleBorder(
             borderRadius: borderRadius ?? BorderRadius.circular(12),
           ),
@@ -114,8 +114,8 @@ class CustomOutlinedButton extends StatelessWidget {
           foregroundColor: textColor ?? theme.primaryColor,
           disabledForegroundColor: Colors.grey[600],
           side: BorderSide(
-            color: isDisabled 
-                ? Colors.grey[300]! 
+            color: isDisabled
+                ? Colors.grey[300]!
                 : borderColor ?? theme.primaryColor,
             width: 1.5,
           ),
@@ -155,4 +155,3 @@ class CustomOutlinedButton extends StatelessWidget {
     );
   }
 }
-

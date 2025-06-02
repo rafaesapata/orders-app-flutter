@@ -1,3 +1,5 @@
+import 'package:orders_app/data/models/user.dart';
+
 class LoginRequest {
   final String email;
   final String password;
@@ -88,4 +90,3 @@ class AuthState {
     return 'AuthState(isAuthenticated: $isAuthenticated, isLoading: $isLoading, error: $error)';
   }
 }
-

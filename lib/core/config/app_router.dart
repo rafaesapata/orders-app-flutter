@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:orders_app/presentation/pages/employee_form_page.dart';
+import 'package:orders_app/presentation/pages/employees_list_page.dart';
+import 'package:orders_app/presentation/pages/home_page.dart';
+import 'package:orders_app/presentation/pages/login_page.dart';
+import 'package:orders_app/presentation/pages/order_form_page.dart';
+import 'package:orders_app/presentation/pages/orders_list_page.dart';
+import 'package:orders_app/presentation/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
-import '../presentation/providers/auth_provider.dart';
-import '../presentation/pages/login_page.dart';
-import '../presentation/pages/home_page.dart';
-import '../presentation/pages/orders_list_page.dart';
-import '../presentation/pages/order_form_page.dart';
-import '../presentation/pages/employees_list_page.dart';
-import '../presentation/pages/employee_form_page.dart';
 
 class AppRouter {
   static GoRouter createRouter() {
@@ -147,7 +147,7 @@ class ProfilePage extends StatelessWidget {
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
           final user = authProvider.user;
-          
+
           if (user == null) {
             return const Center(
               child: Text('Usuário não encontrado'),
@@ -166,7 +166,12 @@ class ProfilePage extends StatelessWidget {
                         radius: 50,
                         backgroundColor: Theme.of(context).primaryColor,
                         child: Text(
-                          user.name.split(' ').map((n) => n[0]).take(2).join().toUpperCase(),
+                          user.name
+                              .split(' ')
+                              .map((n) => n[0])
+                              .take(2)
+                              .join()
+                              .toUpperCase(),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 32,
@@ -183,8 +188,8 @@ class ProfilePage extends StatelessWidget {
                       Text(
                         user.email,
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                              color: Colors.grey[600],
+                            ),
                       ),
                     ],
                   ),
@@ -263,4 +268,3 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
-

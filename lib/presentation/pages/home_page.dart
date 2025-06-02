@@ -123,7 +123,13 @@ class DashboardTab extends StatelessWidget {
                                 radius: 30,
                                 backgroundColor: Theme.of(context).primaryColor,
                                 child: Text(
-                                  authProvider.user?.name.split(' ').map((n) => n[0]).take(2).join().toUpperCase() ?? 'U',
+                                  authProvider.user?.name
+                                          .split(' ')
+                                          .map((n) => n[0])
+                                          .take(2)
+                                          .join()
+                                          .toUpperCase() ??
+                                      'U',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 20,
@@ -138,14 +144,19 @@ class DashboardTab extends StatelessWidget {
                                   children: [
                                     Text(
                                       'Olá, ${authProvider.user?.name.split(' ').first ?? 'Usuário'}!',
-                                      style: Theme.of(context).textTheme.titleLarge,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge,
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
                                       'Bem-vindo ao Orders App',
-                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                        color: Colors.grey[600],
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            color: Colors.grey[600],
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -285,43 +296,46 @@ class DashboardTab extends StatelessWidget {
                     )
                   else
                     ...ordersProvider.getRecentOrders(limit: 3).map(
-                      (order) => Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: _getStatusColor(order.status),
-                            child: Icon(
-                              _getStatusIcon(order.status),
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                          title: Text(order.customerName),
-                          subtitle: Text(
-                            '${order.items.length} ${order.items.length == 1 ? 'item' : 'itens'} • R\$ ${order.total.toStringAsFixed(2)}',
-                          ),
-                          trailing: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: _getStatusColor(order.status).withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: _getStatusColor(order.status).withOpacity(0.3),
+                          (order) => Card(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: _getStatusColor(order.status),
+                                child: Icon(
+                                  _getStatusIcon(order.status),
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
                               ),
-                            ),
-                            child: Text(
-                              order.status.label,
-                              style: TextStyle(
-                                color: _getStatusColor(order.status),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
+                              title: Text(order.customerName),
+                              subtitle: Text(
+                                '${order.items.length} ${order.items.length == 1 ? 'item' : 'itens'} • R\$ ${order.total.toStringAsFixed(2)}',
                               ),
+                              trailing: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: _getStatusColor(order.status)
+                                      .withAlpha(25),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: _getStatusColor(order.status)
+                                        .withAlpha(76),
+                                  ),
+                                ),
+                                child: Text(
+                                  order.status.label,
+                                  style: TextStyle(
+                                    color: _getStatusColor(order.status),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              onTap: () => context.go('/orders'),
                             ),
                           ),
-                          onTap: () => context.go('/orders'),
                         ),
-                      ),
-                    ),
 
                   if (ordersProvider.orders.isNotEmpty)
                     Padding(
@@ -368,9 +382,9 @@ class DashboardTab extends StatelessWidget {
               Text(
                 value,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: color,
-                  fontWeight: FontWeight.bold,
-                ),
+                      color: color,
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               const SizedBox(height: 4),
               Text(
@@ -456,4 +470,3 @@ class ProfileTab extends StatelessWidget {
     return const SizedBox.shrink();
   }
 }
-

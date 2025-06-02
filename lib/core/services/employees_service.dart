@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'package:orders_app/data/models/employee.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import '../models/employee.dart';
 
 class EmployeesService {
   static const String _employeesKey = 'employees_data';
@@ -49,18 +49,19 @@ class EmployeesService {
   ];
 
   Future<List<Employee>> getEmployees() async {
-    await Future.delayed(const Duration(milliseconds: 500)); // Simula delay de rede
-    
+    await Future.delayed(
+        const Duration(milliseconds: 500)); // Simula delay de rede
+
     final prefs = await SharedPreferences.getInstance();
     final employeesJson = prefs.getString(_employeesKey);
-    
+
     if (employeesJson == null) {
       // Retorna funcionários de exemplo na primeira execução
       final sampleEmployees = _generateSampleEmployees();
       await _saveEmployees(sampleEmployees);
       return sampleEmployees;
     }
-    
+
     try {
       final employeesList = jsonDecode(employeesJson) as List<dynamic>;
       return employeesList
@@ -92,7 +93,8 @@ class EmployeesService {
     required DateTime hireDate,
     String? address,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 800)); // Simula delay de rede
+    await Future.delayed(
+        const Duration(milliseconds: 800)); // Simula delay de rede
 
     // Validações
     if (name.trim().isEmpty) {
@@ -148,7 +150,8 @@ class EmployeesService {
     return employee;
   }
 
-  Future<Employee> updateEmployee(String employeeId, {
+  Future<Employee> updateEmployee(
+    String employeeId, {
     String? name,
     String? email,
     String? phone,
@@ -166,7 +169,7 @@ class EmployeesService {
 
     final employees = await getEmployees();
     final employeeIndex = employees.indexWhere((emp) => emp.id == employeeId);
-    
+
     if (employeeIndex == -1) {
       throw Exception('Funcionário não encontrado');
     }
@@ -176,7 +179,9 @@ class EmployeesService {
     // Verifica se o novo email já existe (se foi alterado)
     if (email != null && email.toLowerCase().trim() != currentEmployee.email) {
       final emailExists = employees.any(
-        (emp) => emp.id != employeeId && emp.email.toLowerCase() == email.toLowerCase().trim(),
+        (emp) =>
+            emp.id != employeeId &&
+            emp.email.toLowerCase() == email.toLowerCase().trim(),
       );
 
       if (emailExists) {
@@ -211,7 +216,7 @@ class EmployeesService {
 
     final employees = await getEmployees();
     final employeeExists = employees.any((emp) => emp.id == employeeId);
-    
+
     if (!employeeExists) {
       throw Exception('Funcionário não encontrado');
     }
@@ -222,15 +227,15 @@ class EmployeesService {
 
   Future<List<Department>> getDepartments() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    
+
     final prefs = await SharedPreferences.getInstance();
     final departmentsJson = prefs.getString(_departmentsKey);
-    
+
     if (departmentsJson == null) {
       await _saveDepartments(_sampleDepartments);
       return _sampleDepartments;
     }
-    
+
     try {
       final departmentsList = jsonDecode(departmentsJson) as List<dynamic>;
       return departmentsList
@@ -254,24 +259,26 @@ class EmployeesService {
   Future<List<Employee>> searchEmployees(String query) async {
     final employees = await getEmployees();
     final lowercaseQuery = query.toLowerCase();
-    
+
     return employees.where((emp) {
       return emp.name.toLowerCase().contains(lowercaseQuery) ||
-             emp.email.toLowerCase().contains(lowercaseQuery) ||
-             emp.department.toLowerCase().contains(lowercaseQuery) ||
-             emp.position.toLowerCase().contains(lowercaseQuery);
+          emp.email.toLowerCase().contains(lowercaseQuery) ||
+          emp.department.toLowerCase().contains(lowercaseQuery) ||
+          emp.position.toLowerCase().contains(lowercaseQuery);
     }).toList();
   }
 
   Future<void> _saveEmployees(List<Employee> employees) async {
     final prefs = await SharedPreferences.getInstance();
-    final employeesJson = jsonEncode(employees.map((emp) => emp.toJson()).toList());
+    final employeesJson =
+        jsonEncode(employees.map((emp) => emp.toJson()).toList());
     await prefs.setString(_employeesKey, employeesJson);
   }
 
   Future<void> _saveDepartments(List<Department> departments) async {
     final prefs = await SharedPreferences.getInstance();
-    final departmentsJson = jsonEncode(departments.map((dept) => dept.toJson()).toList());
+    final departmentsJson =
+        jsonEncode(departments.map((dept) => dept.toJson()).toList());
     await prefs.setString(_departmentsKey, departmentsJson);
   }
 
@@ -375,4 +382,3 @@ class EmployeesService {
     ];
   }
 }
-

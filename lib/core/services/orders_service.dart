@@ -1,8 +1,10 @@
 import 'dart:convert';
+
+import 'package:orders_app/data/models/order.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import '../models/order.dart';
-import '../models/product.dart';
+
+import '../../data/models/product.dart';
 
 class OrdersService {
   static const String _ordersKey = 'orders_data';
@@ -59,18 +61,19 @@ class OrdersService {
   ];
 
   Future<List<Order>> getOrders() async {
-    await Future.delayed(const Duration(milliseconds: 500)); // Simula delay de rede
-    
+    await Future.delayed(
+        const Duration(milliseconds: 500)); // Simula delay de rede
+
     final prefs = await SharedPreferences.getInstance();
     final ordersJson = prefs.getString(_ordersKey);
-    
+
     if (ordersJson == null) {
       // Retorna pedidos de exemplo na primeira execução
       final sampleOrders = _generateSampleOrders();
       await _saveOrders(sampleOrders);
       return sampleOrders;
     }
-    
+
     try {
       final ordersList = jsonDecode(ordersJson) as List<dynamic>;
       return ordersList
@@ -98,7 +101,8 @@ class OrdersService {
     String? notes,
     String? deliveryAddress,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 800)); // Simula delay de rede
+    await Future.delayed(
+        const Duration(milliseconds: 800)); // Simula delay de rede
 
     if (items.isEmpty) {
       throw Exception('Pedido deve conter pelo menos um item');
@@ -138,7 +142,7 @@ class OrdersService {
 
     final orders = await getOrders();
     final orderIndex = orders.indexWhere((order) => order.id == orderId);
-    
+
     if (orderIndex == -1) {
       throw Exception('Pedido não encontrado');
     }
@@ -164,15 +168,15 @@ class OrdersService {
 
   Future<List<Product>> getProducts() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    
+
     final prefs = await SharedPreferences.getInstance();
     final productsJson = prefs.getString(_productsKey);
-    
+
     if (productsJson == null) {
       await _saveProducts(_sampleProducts);
       return _sampleProducts;
     }
-    
+
     try {
       final productsList = jsonDecode(productsJson) as List<dynamic>;
       return productsList
@@ -185,20 +189,23 @@ class OrdersService {
 
   Future<List<String>> getProductCategories() async {
     final products = await getProducts();
-    final categories = products.map((product) => product.category).toSet().toList();
+    final categories =
+        products.map((product) => product.category).toSet().toList();
     categories.sort();
     return categories;
   }
 
   Future<void> _saveOrders(List<Order> orders) async {
     final prefs = await SharedPreferences.getInstance();
-    final ordersJson = jsonEncode(orders.map((order) => order.toJson()).toList());
+    final ordersJson =
+        jsonEncode(orders.map((order) => order.toJson()).toList());
     await prefs.setString(_ordersKey, ordersJson);
   }
 
   Future<void> _saveProducts(List<Product> products) async {
     final prefs = await SharedPreferences.getInstance();
-    final productsJson = jsonEncode(products.map((product) => product.toJson()).toList());
+    final productsJson =
+        jsonEncode(products.map((product) => product.toJson()).toList());
     await prefs.setString(_productsKey, productsJson);
   }
 
@@ -293,4 +300,3 @@ class OrdersService {
     ];
   }
 }
-

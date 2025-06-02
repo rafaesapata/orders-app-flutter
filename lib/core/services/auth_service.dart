@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:orders_app/data/models/auth.dart';
+import 'package:orders_app/data/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/user.dart';
-import '../models/auth.dart';
 
 class AuthService {
   static const String _tokenKey = 'auth_token';
@@ -76,9 +76,9 @@ class AuthService {
   Future<User?> getCurrentUser() async {
     final prefs = await SharedPreferences.getInstance();
     final userJson = prefs.getString(_userKey);
-    
+
     if (userJson == null) return null;
-    
+
     try {
       final userData = jsonDecode(userJson) as Map<String, dynamic>;
       return User.fromJson(userData);
@@ -154,4 +154,3 @@ class AuthService {
     return response;
   }
 }
-

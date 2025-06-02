@@ -42,20 +42,23 @@ class _EmployeesListPageState extends State<EmployeesListPage> {
       filtered = filtered.where((emp) {
         final query = _searchQuery.toLowerCase();
         return emp.name.toLowerCase().contains(query) ||
-               emp.email.toLowerCase().contains(query) ||
-               emp.department.toLowerCase().contains(query) ||
-               emp.position.toLowerCase().contains(query);
+            emp.email.toLowerCase().contains(query) ||
+            emp.department.toLowerCase().contains(query) ||
+            emp.position.toLowerCase().contains(query);
       }).toList();
     }
 
     // Filtro por status
     if (_selectedStatus != null) {
-      filtered = filtered.where((emp) => emp.status == _selectedStatus).toList();
+      filtered =
+          filtered.where((emp) => emp.status == _selectedStatus).toList();
     }
 
     // Filtro por departamento
     if (_selectedDepartment != null && _selectedDepartment!.isNotEmpty) {
-      filtered = filtered.where((emp) => emp.department == _selectedDepartment).toList();
+      filtered = filtered
+          .where((emp) => emp.department == _selectedDepartment)
+          .toList();
     }
 
     return filtered;
@@ -79,13 +82,15 @@ class _EmployeesListPageState extends State<EmployeesListPage> {
       ),
       body: Consumer<EmployeesProvider>(
         builder: (context, employeesProvider, child) {
-          if (employeesProvider.isLoading && employeesProvider.employees.isEmpty) {
+          if (employeesProvider.isLoading &&
+              employeesProvider.employees.isEmpty) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
 
-          final filteredEmployees = _getFilteredEmployees(employeesProvider.employees);
+          final filteredEmployees =
+              _getFilteredEmployees(employeesProvider.employees);
 
           return Column(
             children: [
@@ -107,9 +112,9 @@ class _EmployeesListPageState extends State<EmployeesListPage> {
                         });
                       },
                     ),
-                    
+
                     const SizedBox(height: 12),
-                    
+
                     // Filtros
                     Row(
                       children: [
@@ -146,9 +151,9 @@ class _EmployeesListPageState extends State<EmployeesListPage> {
                             },
                           ),
                         ),
-                        
+
                         const SizedBox(width: 12),
-                        
+
                         // Filtro por departamento
                         Expanded(
                           child: DropdownButtonFormField<String?>(
@@ -190,7 +195,8 @@ class _EmployeesListPageState extends State<EmployeesListPage> {
 
               // Estatísticas rápidas
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -232,7 +238,9 @@ class _EmployeesListPageState extends State<EmployeesListPage> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              _searchQuery.isNotEmpty || _selectedStatus != null || _selectedDepartment != null
+                              _searchQuery.isNotEmpty ||
+                                      _selectedStatus != null ||
+                                      _selectedDepartment != null
                                   ? 'Nenhum funcionário encontrado com os filtros aplicados'
                                   : 'Nenhum funcionário cadastrado',
                               style: TextStyle(
@@ -298,13 +306,14 @@ class _EmployeesListPageState extends State<EmployeesListPage> {
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+      String label, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha(25),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withAlpha(76)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -332,15 +341,21 @@ class _EmployeesListPageState extends State<EmployeesListPage> {
   }
 
   Widget _buildEmployeeCard(Employee employee) {
-    final currencyFormat = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
-    
+    final currencyFormat =
+        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: _getStatusColor(employee.status),
           child: Text(
-            employee.name.split(' ').map((n) => n[0]).take(2).join().toUpperCase(),
+            employee.name
+                .split(' ')
+                .map((n) => n[0])
+                .take(2)
+                .join()
+                .toUpperCase(),
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -371,10 +386,10 @@ class _EmployeesListPageState extends State<EmployeesListPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: _getStatusColor(employee.status).withOpacity(0.1),
+                color: _getStatusColor(employee.status).withAlpha(25),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: _getStatusColor(employee.status).withOpacity(0.3),
+                  color: _getStatusColor(employee.status).withAlpha(76),
                 ),
               ),
               child: Text(
@@ -413,4 +428,3 @@ class _EmployeesListPageState extends State<EmployeesListPage> {
     }
   }
 }
-

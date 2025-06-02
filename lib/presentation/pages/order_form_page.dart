@@ -24,7 +24,7 @@ class _OrderFormPageState extends State<OrderFormPage> {
   final _notesController = TextEditingController();
   final _deliveryAddressController = TextEditingController();
 
-  List<OrderItem> _orderItems = [];
+  final List<OrderItem> _orderItems = [];
   bool get isEditing => widget.orderId != null;
 
   @override
@@ -134,18 +134,18 @@ class _OrderFormPageState extends State<OrderFormPage> {
     final ordersProvider = context.read<OrdersProvider>();
     final success = await ordersProvider.createOrder(
       customerName: _customerNameController.text.trim(),
-      customerPhone: _customerPhoneController.text.trim().isEmpty 
-          ? null 
+      customerPhone: _customerPhoneController.text.trim().isEmpty
+          ? null
           : _customerPhoneController.text.trim(),
-      customerEmail: _customerEmailController.text.trim().isEmpty 
-          ? null 
+      customerEmail: _customerEmailController.text.trim().isEmpty
+          ? null
           : _customerEmailController.text.trim(),
       items: _orderItems,
-      notes: _notesController.text.trim().isEmpty 
-          ? null 
+      notes: _notesController.text.trim().isEmpty
+          ? null
           : _notesController.text.trim(),
-      deliveryAddress: _deliveryAddressController.text.trim().isEmpty 
-          ? null 
+      deliveryAddress: _deliveryAddressController.text.trim().isEmpty
+          ? null
           : _deliveryAddressController.text.trim(),
     );
 
@@ -333,7 +333,7 @@ class _OrderFormPageState extends State<OrderFormPage> {
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
+                          color: Colors.grey.withAlpha(51),
                           spreadRadius: 1,
                           blurRadius: 4,
                           offset: const Offset(0, -2),
@@ -379,7 +379,8 @@ class _OrderFormPageState extends State<OrderFormPage> {
                         const SizedBox(height: 16),
                         CustomButton(
                           text: isEditing ? 'Atualizar Pedido' : 'Criar Pedido',
-                          onPressed: ordersProvider.isLoading ? null : _saveOrder,
+                          onPressed:
+                              ordersProvider.isLoading ? null : _saveOrder,
                           isLoading: ordersProvider.isLoading,
                         ),
                       ],
@@ -422,9 +423,9 @@ class _OrderFormPageState extends State<OrderFormPage> {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-        fontWeight: FontWeight.bold,
-        color: Theme.of(context).primaryColor,
-      ),
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).primaryColor,
+          ),
     );
   }
 
@@ -532,7 +533,8 @@ class _OrderFormPageState extends State<OrderFormPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  onPressed: () => _updateItemQuantity(index, item.quantity - 1),
+                  onPressed: () =>
+                      _updateItemQuantity(index, item.quantity - 1),
                   icon: const Icon(Icons.remove_circle_outline),
                   color: Colors.red,
                 ),
@@ -541,7 +543,8 @@ class _OrderFormPageState extends State<OrderFormPage> {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 IconButton(
-                  onPressed: () => _updateItemQuantity(index, item.quantity + 1),
+                  onPressed: () =>
+                      _updateItemQuantity(index, item.quantity + 1),
                   icon: const Icon(Icons.add_circle_outline),
                   color: Colors.green,
                 ),
@@ -607,18 +610,21 @@ class _ProductQuantityDialogState extends State<_ProductQuantityDialog> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
-                onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
+                onPressed:
+                    _quantity > 1 ? () => setState(() => _quantity--) : null,
                 icon: const Icon(Icons.remove_circle_outline),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey[300]!),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   _quantity.toString(),
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
               IconButton(
@@ -660,4 +666,3 @@ class _ProductQuantityDialogState extends State<_ProductQuantityDialog> {
     );
   }
 }
-

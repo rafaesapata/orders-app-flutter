@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-import '../providers/employees_provider.dart';
-import '../widgets/custom_text_field.dart';
-import '../widgets/custom_button.dart';
+import 'package:provider/provider.dart';
+
 import '../../data/models/employee.dart';
+import '../providers/employees_provider.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/custom_text_field.dart';
 
 class EmployeeFormPage extends StatefulWidget {
   final Employee? employee;
@@ -25,7 +26,7 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
   final _positionController = TextEditingController();
   final _salaryController = TextEditingController();
   final _addressController = TextEditingController();
-  
+
   String? _selectedDepartment;
   EmployeeRole _selectedRole = EmployeeRole.employee;
   EmployeeStatus _selectedStatus = EmployeeStatus.active;
@@ -78,7 +79,7 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
       firstDate: DateTime(1950),
       lastDate: DateTime.now(),
     );
-    
+
     if (date != null) {
       setState(() {
         _selectedHireDate = date;
@@ -108,27 +109,31 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
         name: _nameController.text,
         email: _emailController.text,
         phone: _phoneController.text.isEmpty ? null : _phoneController.text,
-        document: _documentController.text.isEmpty ? null : _documentController.text,
+        document:
+            _documentController.text.isEmpty ? null : _documentController.text,
         department: _selectedDepartment!,
         position: _positionController.text,
         role: _selectedRole,
         status: _selectedStatus,
         salary: double.parse(_salaryController.text.replaceAll(',', '.')),
         hireDate: _selectedHireDate,
-        address: _addressController.text.isEmpty ? null : _addressController.text,
+        address:
+            _addressController.text.isEmpty ? null : _addressController.text,
       );
     } else {
       success = await employeesProvider.createEmployee(
         name: _nameController.text,
         email: _emailController.text,
         phone: _phoneController.text.isEmpty ? null : _phoneController.text,
-        document: _documentController.text.isEmpty ? null : _documentController.text,
+        document:
+            _documentController.text.isEmpty ? null : _documentController.text,
         department: _selectedDepartment!,
         position: _positionController.text,
         role: _selectedRole,
         salary: double.parse(_salaryController.text.replaceAll(',', '.')),
         hireDate: _selectedHireDate,
-        address: _addressController.text.isEmpty ? null : _addressController.text,
+        address:
+            _addressController.text.isEmpty ? null : _addressController.text,
       );
     }
 
@@ -136,7 +141,7 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isEditing 
+            isEditing
                 ? 'Funcionário atualizado com sucesso!'
                 : 'Funcionário cadastrado com sucesso!',
           ),
@@ -196,7 +201,8 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
                       if (value == null || value.trim().isEmpty) {
                         return 'Email é obrigatório';
                       }
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                          .hasMatch(value)) {
                         return 'Email inválido';
                       }
                       return null;
@@ -376,13 +382,15 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
                           controller: _salaryController,
                           label: 'Salário *',
                           hintText: '0,00',
-                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true),
                           prefixIcon: Icons.attach_money,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return 'Salário é obrigatório';
                             }
-                            final salary = double.tryParse(value.replaceAll(',', '.'));
+                            final salary =
+                                double.tryParse(value.replaceAll(',', '.'));
                             if (salary == null || salary <= 0) {
                               return 'Salário deve ser maior que zero';
                             }
@@ -398,7 +406,8 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
                         child: InkWell(
                           onTap: _selectDate,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 16),
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey[300]!),
                               borderRadius: BorderRadius.circular(12),
@@ -406,11 +415,13 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
                             ),
                             child: Row(
                               children: [
-                                const Icon(Icons.calendar_today, color: Colors.grey),
+                                const Icon(Icons.calendar_today,
+                                    color: Colors.grey),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Data de Contratação *',
@@ -422,7 +433,8 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        DateFormat('dd/MM/yyyy').format(_selectedHireDate),
+                                        DateFormat('dd/MM/yyyy')
+                                            .format(_selectedHireDate),
                                         style: const TextStyle(fontSize: 16),
                                       ),
                                     ],
@@ -450,7 +462,8 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.error_outline, color: Colors.red[700], size: 20),
+                          Icon(Icons.error_outline,
+                              color: Colors.red[700], size: 20),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -475,7 +488,9 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
                       Expanded(
                         child: CustomButton(
                           text: isEditing ? 'Atualizar' : 'Cadastrar',
-                          onPressed: employeesProvider.isLoading ? null : _saveEmployee,
+                          onPressed: employeesProvider.isLoading
+                              ? null
+                              : _saveEmployee,
                           isLoading: employeesProvider.isLoading,
                         ),
                       ),
@@ -496,10 +511,9 @@ class _EmployeeFormPageState extends State<EmployeeFormPage> {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-        fontWeight: FontWeight.bold,
-        color: Theme.of(context).primaryColor,
-      ),
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).primaryColor,
+          ),
     );
   }
 }
-

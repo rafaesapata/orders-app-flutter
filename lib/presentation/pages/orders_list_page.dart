@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import '../../data/models/order.dart';
 import '../providers/orders_provider.dart';
 import '../widgets/custom_text_field.dart';
-import '../../data/models/order.dart';
 import 'order_form_page.dart';
 
 class OrdersListPage extends StatefulWidget {
@@ -40,14 +41,15 @@ class _OrdersListPageState extends State<OrdersListPage> {
       filtered = filtered.where((order) {
         final query = _searchQuery.toLowerCase();
         return order.customerName.toLowerCase().contains(query) ||
-               order.id.toLowerCase().contains(query) ||
-               (order.customerPhone?.toLowerCase().contains(query) ?? false);
+            order.id.toLowerCase().contains(query) ||
+            (order.customerPhone?.toLowerCase().contains(query) ?? false);
       }).toList();
     }
 
     // Filtro por status
     if (_selectedStatus != null) {
-      filtered = filtered.where((order) => order.status == _selectedStatus).toList();
+      filtered =
+          filtered.where((order) => order.status == _selectedStatus).toList();
     }
 
     return filtered;
@@ -55,7 +57,8 @@ class _OrdersListPageState extends State<OrdersListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+    final currencyFormat =
+        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
 
     return Scaffold(
@@ -102,9 +105,9 @@ class _OrdersListPageState extends State<OrdersListPage> {
                         });
                       },
                     ),
-                    
+
                     const SizedBox(height: 12),
-                    
+
                     // Filtro por status
                     DropdownButtonFormField<OrderStatus?>(
                       value: _selectedStatus,
@@ -142,7 +145,8 @@ class _OrdersListPageState extends State<OrdersListPage> {
 
               // Estatísticas rápidas
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
@@ -193,14 +197,16 @@ class _OrdersListPageState extends State<OrdersListPage> {
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            if (_searchQuery.isEmpty && _selectedStatus == null) ...[
+                            if (_searchQuery.isEmpty &&
+                                _selectedStatus == null) ...[
                               const SizedBox(height: 16),
                               ElevatedButton(
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const OrderFormPage(),
+                                      builder: (context) =>
+                                          const OrderFormPage(),
                                     ),
                                   );
                                 },
@@ -216,7 +222,8 @@ class _OrdersListPageState extends State<OrdersListPage> {
                           itemCount: filteredOrders.length,
                           itemBuilder: (context, index) {
                             final order = filteredOrders[index];
-                            return _buildOrderCard(order, currencyFormat, dateFormat);
+                            return _buildOrderCard(
+                                order, currencyFormat, dateFormat);
                           },
                         ),
                       ),
@@ -264,13 +271,14 @@ class _OrdersListPageState extends State<OrdersListPage> {
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+      String label, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha(25),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withAlpha(76)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -297,7 +305,8 @@ class _OrdersListPageState extends State<OrdersListPage> {
     );
   }
 
-  Widget _buildOrderCard(Order order, NumberFormat currencyFormat, DateFormat dateFormat) {
+  Widget _buildOrderCard(
+      Order order, NumberFormat currencyFormat, DateFormat dateFormat) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: ExpansionTile(
@@ -336,10 +345,10 @@ class _OrdersListPageState extends State<OrdersListPage> {
         trailing: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: _getStatusColor(order.status).withOpacity(0.1),
+            color: _getStatusColor(order.status).withAlpha(25),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: _getStatusColor(order.status).withOpacity(0.3),
+              color: _getStatusColor(order.status).withAlpha(76),
             ),
           ),
           child: Text(
@@ -358,7 +367,8 @@ class _OrdersListPageState extends State<OrdersListPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Informações do cliente
-                if (order.customerPhone != null || order.customerEmail != null) ...[
+                if (order.customerPhone != null ||
+                    order.customerEmail != null) ...[
                   const Text(
                     'Informações do Cliente:',
                     style: TextStyle(fontWeight: FontWeight.w600),
@@ -469,8 +479,11 @@ class _OrdersListPageState extends State<OrdersListPage> {
               title: Text(status.label),
               onTap: () async {
                 Navigator.pop(context);
-                final success = await context.read<OrdersProvider>().updateOrderStatus(order.id, status);
-                if (success && mounted) {
+                final success = await context
+                    .read<OrdersProvider>()
+                    .updateOrderStatus(order.id, status);
+
+                if (success && mounted && context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('Status atualizado com sucesso!'),
@@ -491,7 +504,8 @@ class _OrdersListPageState extends State<OrdersListPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Confirmar Exclusão'),
-        content: Text('Tem certeza que deseja excluir o pedido de ${order.customerName}?'),
+        content: Text(
+            'Tem certeza que deseja excluir o pedido de ${order.customerName}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -500,8 +514,9 @@ class _OrdersListPageState extends State<OrdersListPage> {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(context);
-              final success = await context.read<OrdersProvider>().deleteOrder(order.id);
-              if (success && mounted) {
+              final success =
+                  await context.read<OrdersProvider>().deleteOrder(order.id);
+              if (success && mounted && context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Pedido excluído com sucesso!'),
@@ -555,4 +570,3 @@ class _OrdersListPageState extends State<OrdersListPage> {
     }
   }
 }
-

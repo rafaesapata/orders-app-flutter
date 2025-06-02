@@ -1,95 +1,62 @@
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
-import '../models/order.dart';
-import '../models/product.dart';
+import '../config/api_config.dart';
+import 'api_client.dart';
+import '../../data/models/order.dart';
+import '../../data/models/product.dart';
 
 class OrdersService {
-  static const String _ordersKey = 'orders_data';
-  static const String _productsKey = 'products_data';
-  final _uuid = const Uuid();
+  static final OrdersService _instance = OrdersService._internal();
+  factory OrdersService() => _instance;
+  OrdersService._internal();
 
-  // Produtos de exemplo para demonstração
-  static final List<Product> _sampleProducts = [
-    Product(
-      id: '1',
-      name: 'Hambúrguer Clássico',
-      description: 'Hambúrguer com carne, queijo, alface e tomate',
-      price: 25.90,
-      category: 'Hambúrgueres',
-      stockQuantity: 50,
-      createdAt: DateTime.now().subtract(const Duration(days: 30)),
-    ),
-    Product(
-      id: '2',
-      name: 'Pizza Margherita',
-      description: 'Pizza com molho de tomate, mussarela e manjericão',
-      price: 35.00,
-      category: 'Pizzas',
-      stockQuantity: 25,
-      createdAt: DateTime.now().subtract(const Duration(days: 25)),
-    ),
-    Product(
-      id: '3',
-      name: 'Refrigerante Cola',
-      description: 'Refrigerante de cola 350ml',
-      price: 5.50,
-      category: 'Bebidas',
-      stockQuantity: 100,
-      createdAt: DateTime.now().subtract(const Duration(days: 20)),
-    ),
-    Product(
-      id: '4',
-      name: 'Batata Frita',
-      description: 'Porção de batata frita crocante',
-      price: 12.00,
-      category: 'Acompanhamentos',
-      stockQuantity: 75,
-      createdAt: DateTime.now().subtract(const Duration(days: 15)),
-    ),
-    Product(
-      id: '5',
-      name: 'Salada Caesar',
-      description: 'Salada com alface, croutons, parmesão e molho caesar',
-      price: 18.50,
-      category: 'Saladas',
-      stockQuantity: 30,
-      createdAt: DateTime.now().subtract(const Duration(days: 10)),
-    ),
-  ];
+  final ApiClient _apiClient = ApiClient();
 
-  Future<List<Order>> getOrders() async {
-    await Future.delayed(const Duration(milliseconds: 500)); // Simula delay de rede
-    
-    final prefs = await SharedPreferences.getInstance();
-    final ordersJson = prefs.getString(_ordersKey);
-    
-    if (ordersJson == null) {
-      // Retorna pedidos de exemplo na primeira execução
-      final sampleOrders = _generateSampleOrders();
-      await _saveOrders(sampleOrders);
-      return sampleOrders;
-    }
-    
+  /// Busca todos os pedidos
+  Future<List<Order>> getOrders({
+    int page = 1,
+    int limit = 50,
+    OrderStatus? status,
+    String? search,
+  }) async {
     try {
-      final ordersList = jsonDecode(ordersJson) as List<dynamic>;
-      return ordersList
-          .map((json) => Order.fromJson(json as Map<String, dynamic>))
-          .toList();
+      final queryParams = <String, String>{
+        'page': page.toString(),
+        'limit': limit.toString(),
+      };
+
+      if (status != null) {
+        queryParams['status'] = status.value;
+      }
+
+      if (search != null && search.isNotEmpty) {
+        queryParams['search'] = search;
+      }
+
+      final queryString = queryParams.entries
+          .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+          .join('&');
+
+      final endpoint = '${ApiConfig.ordersEndpoint}?$queryString';
+      final response = await _apiClient.get(endpoint);
+
+      final ordersData = response['data'] as List<dynamic>? ?? response['orders'] as List<dynamic>? ?? [];
+      return ordersData.map((json) => Order.fromJson(json)).toList();
     } catch (e) {
-      return [];
+      throw Exception('Erro ao buscar pedidos: $e');
     }
   }
 
+  /// Busca um pedido específico por ID
   Future<Order?> getOrderById(String id) async {
-    final orders = await getOrders();
     try {
-      return orders.firstWhere((order) => order.id == id);
+      final response = await _apiClient.get('${ApiConfig.ordersEndpoint}/$id');
+      return Order.fromJson(response['data'] ?? response);
     } catch (e) {
       return null;
     }
   }
 
+  /// Cria um novo pedido
   Future<Order> createOrder({
     required String customerName,
     String? customerPhone,
@@ -98,197 +65,194 @@ class OrdersService {
     String? notes,
     String? deliveryAddress,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 800)); // Simula delay de rede
-
-    if (items.isEmpty) {
-      throw Exception('Pedido deve conter pelo menos um item');
-    }
-
-    final subtotal = items.fold(0.0, (sum, item) => sum + item.total);
-    final tax = subtotal * 0.1; // 10% de taxa
-    const discount = 0.0;
-    final total = subtotal + tax - discount;
-
-    final order = Order(
-      id: _uuid.v4(),
-      customerId: _uuid.v4(),
-      customerName: customerName,
-      customerPhone: customerPhone,
-      customerEmail: customerEmail,
-      createdAt: DateTime.now(),
-      status: OrderStatus.pending,
-      items: items,
-      subtotal: subtotal,
-      tax: tax,
-      discount: discount,
-      total: total,
-      notes: notes,
-      deliveryAddress: deliveryAddress,
-    );
-
-    final orders = await getOrders();
-    orders.insert(0, order); // Adiciona no início da lista
-    await _saveOrders(orders);
-
-    return order;
-  }
-
-  Future<Order> updateOrderStatus(String orderId, OrderStatus newStatus) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    final orders = await getOrders();
-    final orderIndex = orders.indexWhere((order) => order.id == orderId);
-    
-    if (orderIndex == -1) {
-      throw Exception('Pedido não encontrado');
-    }
-
-    final updatedOrder = orders[orderIndex].copyWith(
-      status: newStatus,
-      updatedAt: DateTime.now(),
-    );
-
-    orders[orderIndex] = updatedOrder;
-    await _saveOrders(orders);
-
-    return updatedOrder;
-  }
-
-  Future<void> deleteOrder(String orderId) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    final orders = await getOrders();
-    orders.removeWhere((order) => order.id == orderId);
-    await _saveOrders(orders);
-  }
-
-  Future<List<Product>> getProducts() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    
-    final prefs = await SharedPreferences.getInstance();
-    final productsJson = prefs.getString(_productsKey);
-    
-    if (productsJson == null) {
-      await _saveProducts(_sampleProducts);
-      return _sampleProducts;
-    }
-    
     try {
-      final productsList = jsonDecode(productsJson) as List<dynamic>;
-      return productsList
-          .map((json) => Product.fromJson(json as Map<String, dynamic>))
-          .toList();
+      final orderData = {
+        'customer_name': customerName,
+        'customer_phone': customerPhone,
+        'customer_email': customerEmail,
+        'items': items.map((item) => {
+          'product_id': item.productId,
+          'product_name': item.productName,
+          'quantity': item.quantity,
+          'unit_price': item.unitPrice,
+          'total': item.total,
+          'notes': item.notes,
+        }).toList(),
+        'notes': notes,
+        'delivery_address': deliveryAddress,
+        'status': OrderStatus.pending.value,
+        'total': items.fold(0.0, (sum, item) => sum + item.total),
+      };
+
+      final response = await _apiClient.post(ApiConfig.ordersEndpoint, data: orderData);
+      return Order.fromJson(response['data'] ?? response);
     } catch (e) {
-      return _sampleProducts;
+      throw Exception('Erro ao criar pedido: $e');
     }
   }
 
-  Future<List<String>> getProductCategories() async {
-    final products = await getProducts();
-    final categories = products.map((product) => product.category).toSet().toList();
-    categories.sort();
-    return categories;
+  /// Atualiza um pedido existente
+  Future<Order> updateOrder(String id, {
+    String? customerName,
+    String? customerPhone,
+    String? customerEmail,
+    List<OrderItem>? items,
+    String? notes,
+    String? deliveryAddress,
+    OrderStatus? status,
+  }) async {
+    try {
+      final updateData = <String, dynamic>{};
+
+      if (customerName != null) updateData['customer_name'] = customerName;
+      if (customerPhone != null) updateData['customer_phone'] = customerPhone;
+      if (customerEmail != null) updateData['customer_email'] = customerEmail;
+      if (notes != null) updateData['notes'] = notes;
+      if (deliveryAddress != null) updateData['delivery_address'] = deliveryAddress;
+      if (status != null) updateData['status'] = status.value;
+
+      if (items != null) {
+        updateData['items'] = items.map((item) => {
+          'product_id': item.productId,
+          'product_name': item.productName,
+          'quantity': item.quantity,
+          'unit_price': item.unitPrice,
+          'total': item.total,
+          'notes': item.notes,
+        }).toList();
+        updateData['total'] = items.fold(0.0, (sum, item) => sum + item.total);
+      }
+
+      final response = await _apiClient.put('${ApiConfig.ordersEndpoint}/$id', data: updateData);
+      return Order.fromJson(response['data'] ?? response);
+    } catch (e) {
+      throw Exception('Erro ao atualizar pedido: $e');
+    }
   }
 
-  Future<void> _saveOrders(List<Order> orders) async {
-    final prefs = await SharedPreferences.getInstance();
-    final ordersJson = jsonEncode(orders.map((order) => order.toJson()).toList());
-    await prefs.setString(_ordersKey, ordersJson);
+  /// Atualiza apenas o status de um pedido
+  Future<bool> updateOrderStatus(String id, OrderStatus status) async {
+    try {
+      await _apiClient.put(
+        '${ApiConfig.ordersEndpoint}/$id/status',
+        data: {'status': status.value},
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  Future<void> _saveProducts(List<Product> products) async {
-    final prefs = await SharedPreferences.getInstance();
-    final productsJson = jsonEncode(products.map((product) => product.toJson()).toList());
-    await prefs.setString(_productsKey, productsJson);
+  /// Exclui um pedido
+  Future<bool> deleteOrder(String id) async {
+    try {
+      await _apiClient.delete('${ApiConfig.ordersEndpoint}/$id');
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  List<Order> _generateSampleOrders() {
-    final now = DateTime.now();
+  /// Busca produtos disponíveis
+  Future<List<Product>> getProducts({
+    int page = 1,
+    int limit = 100,
+    String? category,
+    String? search,
+  }) async {
+    try {
+      final queryParams = <String, String>{
+        'page': page.toString(),
+        'limit': limit.toString(),
+      };
+
+      if (category != null && category.isNotEmpty) {
+        queryParams['category'] = category;
+      }
+
+      if (search != null && search.isNotEmpty) {
+        queryParams['search'] = search;
+      }
+
+      final queryString = queryParams.entries
+          .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+          .join('&');
+
+      final endpoint = '${ApiConfig.productsEndpoint}?$queryString';
+      final response = await _apiClient.get(endpoint);
+
+      final productsData = response['data'] as List<dynamic>? ?? response['products'] as List<dynamic>? ?? [];
+      return productsData.map((json) => Product.fromJson(json)).toList();
+    } catch (e) {
+      // Fallback para produtos locais se a API não estiver disponível
+      return _getFallbackProducts();
+    }
+  }
+
+  /// Busca estatísticas de pedidos
+  Future<Map<String, dynamic>> getOrdersStats() async {
+    try {
+      final response = await _apiClient.get('${ApiConfig.ordersEndpoint}/stats');
+      return response['data'] ?? response;
+    } catch (e) {
+      // Retorna estatísticas vazias em caso de erro
+      return {
+        'total_orders': 0,
+        'pending_orders': 0,
+        'completed_orders': 0,
+        'total_revenue': 0.0,
+        'average_order_value': 0.0,
+      };
+    }
+  }
+
+  /// Produtos de fallback caso a API não esteja disponível
+  List<Product> _getFallbackProducts() {
     return [
-      Order(
-        id: _uuid.v4(),
-        customerId: 'customer1',
-        customerName: 'João Silva',
-        customerPhone: '(11) 99999-1234',
-        customerEmail: 'joao@email.com',
-        createdAt: now.subtract(const Duration(hours: 2)),
-        status: OrderStatus.preparing,
-        items: [
-          OrderItem(
-            id: _uuid.v4(),
-            productId: '1',
-            productName: 'Hambúrguer Clássico',
-            quantity: 2,
-            unitPrice: 25.90,
-            total: 51.80,
-          ),
-          OrderItem(
-            id: _uuid.v4(),
-            productId: '3',
-            productName: 'Refrigerante Cola',
-            quantity: 2,
-            unitPrice: 5.50,
-            total: 11.00,
-          ),
-        ],
-        subtotal: 62.80,
-        tax: 6.28,
-        discount: 0.0,
-        total: 69.08,
-        deliveryAddress: 'Rua das Flores, 123 - Centro',
+      Product(
+        id: '1',
+        name: 'Hambúrguer Clássico',
+        description: 'Hambúrguer com carne, queijo, alface e tomate',
+        price: 25.90,
+        category: 'Hambúrgueres',
+        isAvailable: true,
+        image: null,
       ),
-      Order(
-        id: _uuid.v4(),
-        customerId: 'customer2',
-        customerName: 'Maria Santos',
-        customerPhone: '(11) 88888-5678',
-        createdAt: now.subtract(const Duration(hours: 5)),
-        status: OrderStatus.delivered,
-        items: [
-          OrderItem(
-            id: _uuid.v4(),
-            productId: '2',
-            productName: 'Pizza Margherita',
-            quantity: 1,
-            unitPrice: 35.00,
-            total: 35.00,
-          ),
-        ],
-        subtotal: 35.00,
-        tax: 3.50,
-        discount: 0.0,
-        total: 38.50,
+      Product(
+        id: '2',
+        name: 'Pizza Margherita',
+        description: 'Pizza com molho de tomate, mussarela e manjericão',
+        price: 35.00,
+        category: 'Pizzas',
+        isAvailable: true,
+        image: null,
       ),
-      Order(
-        id: _uuid.v4(),
-        customerId: 'customer3',
-        customerName: 'Pedro Costa',
-        customerPhone: '(11) 77777-9012',
-        createdAt: now.subtract(const Duration(days: 1)),
-        status: OrderStatus.pending,
-        items: [
-          OrderItem(
-            id: _uuid.v4(),
-            productId: '5',
-            productName: 'Salada Caesar',
-            quantity: 1,
-            unitPrice: 18.50,
-            total: 18.50,
-          ),
-          OrderItem(
-            id: _uuid.v4(),
-            productId: '4',
-            productName: 'Batata Frita',
-            quantity: 1,
-            unitPrice: 12.00,
-            total: 12.00,
-          ),
-        ],
-        subtotal: 30.50,
-        tax: 3.05,
-        discount: 0.0,
-        total: 33.55,
-        notes: 'Sem cebola na salada',
+      Product(
+        id: '3',
+        name: 'Refrigerante Lata',
+        description: 'Refrigerante gelado 350ml',
+        price: 5.50,
+        category: 'Bebidas',
+        isAvailable: true,
+        image: null,
+      ),
+      Product(
+        id: '4',
+        name: 'Batata Frita',
+        description: 'Porção de batata frita crocante',
+        price: 12.00,
+        category: 'Acompanhamentos',
+        isAvailable: true,
+        image: null,
+      ),
+      Product(
+        id: '5',
+        name: 'Salada Caesar',
+        description: 'Salada com alface, croutons, parmesão e molho caesar',
+        price: 18.50,
+        category: 'Saladas',
+        isAvailable: true,
+        image: null,
       ),
     ];
   }

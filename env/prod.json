@@ -1,0 +1,14 @@
+{
+    "BASE_URL": "",
+    
+    "FIREBASE_NAME": "STARTERKIT",
+    "FIREBASE_ANDROID_API_KEY": "AIzaSyCSvplmHx-HBLc5r_3z_1s3yyTdSZjJz4g",
+    "FIREBASE_IOS_API_KEY": "AIzaSyDs9HKUOLDaPWNMhRRDm2AuFbtlL-7ep_c",
+    "FIREBASE_ANDROID_APP_ID": "1:861679707916:android:5bf3e1e7dcf98edcb88b29",
+    "FIREBASE_IOS_APP_ID": "1:861679707916:ios:e4a076cdb356b32db88b29",
+    "FIREBASE_MESSAGING_SENDER_ID": "861679707916",
+    "FIREBASE_PROJECT_ID": "starterkit-9abb5",
+    "FIREBASE_STORAGE_BUCKET": "starterkit-9abb5.appspot.com",
+    "FIREBASE_IOS_BUNDLE_ID": "com.capptan.starterkit",
+    "LOG_ENABLED": false
+}
